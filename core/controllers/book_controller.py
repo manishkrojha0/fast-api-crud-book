@@ -16,6 +16,14 @@ from auth.auth_bearer import JWTBearer
 router = APIRouter()
 auth_handler = AuthHandler()
 
+def has_role(required_role: str = None):
+    def _has_role(token: str = Depends(auth_handler.oauth2_scheme)):
+        user = auth_handler.decode_token(token)
+        if not user or user.get("role") != required_role:
+            raise HTTPException(status_code=403, detail="Insufficient privileges")
+        return user
+    return _has_role
+
 
 @router.get("/books", dependencies=[Depends(JWTBearer())], response_model=List[Book])
 def get_books(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
@@ -33,14 +41,14 @@ def get_book_by_id(book_id: int, db: Session = Depends(get_db)):
     return book
 
 
-@router.post("/books", status_code=201,dependencies=[Depends(JWTBearer())] , response_model=Book)
+@router.post("/books", status_code=201,dependencies=[Depends(JWTBearer()), Depends(has_role('admin'))] , response_model=Book)
 def create_book(book: BookCreate, db: Session = Depends(get_db)):
     repository = BookRepository(db)
     created_book = repository.create_book(book)
     return created_book
 
 
-@router.put("/books/{book_id}",dependencies=[Depends(JWTBearer())], response_model=Book)
+@router.put("/books/{book_id}",dependencies=[Depends(JWTBearer()), Depends(has_role('admin'))], response_model=Book)
 def update_book(book_id: int, book: BookUpdate, db: Session = Depends(get_db)):
     repository = BookRepository(db)
     updated_book = repository.update_book(book_id, book)
@@ -49,7 +57,7 @@ def update_book(book_id: int, book: BookUpdate, db: Session = Depends(get_db)):
     return updated_book
 
 
-@router.delete("/books/{book_id}",dependencies=[Depends(JWTBearer())], status_code=204)
+@router.delete("/books/{book_id}",dependencies=[Depends(JWTBearer()), Depends(has_role('admin'))], status_code=204)
 def delete_book(book_id: int, db: Session = Depends(get_db)):
     repository = BookRepository(db)
     deleted_book = repository.delete_book(book_id)

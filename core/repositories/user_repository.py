@@ -44,18 +44,8 @@ class UserRepository:
         return self.db.query(User).filter(User.email == email).first()
     
     def create_token(self, user: LoginUser):
-        # user_obj = LoginUser.from_orm(user)
-        # user_dict = user_obj.dict()
-        # is_authenticated_user = self.authenticate_user(user_obj.email, user_obj.password,
-        #                                                 self.auth_handler.get_password_hash(user_obj.password
-        # ))
-        # if not is_authenticated_user:
-        #     raise HTTPException(status_code=400, detail="Invalid credentials")
-
-        # token = self.auth_handler.encode_token(user_dict)
-
-        # return dict(access_token=token, token_type="bearer")
-        return signJWT(user.email)
+        user_obj = self.db.query(User).filter(User.email == user.email).first()
+        return signJWT(user.email, user_obj.role)
     
 
     def authenticate_user(self, email: str, password: str, hashed_password: str):
