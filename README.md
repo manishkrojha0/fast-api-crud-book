@@ -3,6 +3,17 @@
 # BOOK CRUD USING FASTAPI FRAMEWORK
 This is a RESTful API for managing books. It provides endpoints to perform CRUD operations on books and user authentication.
 
+## Features
+- User Authentication: The project provides user authentication functionality to secure access to the system.
+- Book Management: Users can perform various operations related to book management, such as creating, updating, and deleting books.
+- Role-based Access Control: Different roles, such as "admin" and "user," are implemented to control access to specific features and endpoints.
+- Pagination: The book listing endpoint supports pagination, allowing users to retrieve a paginated list of books.
+- Search and Filtering: Users can search and filter books based on different criteria, such as author ID and specific search terms.
+- Sorting: Books can be sorted based on different parameters, providing flexibility in displaying the book list.
+- Exception Handling: Appropriate exception handling is implemented to handle errors and provide meaningful error responses to clients.
+- Testing: Unit tests are included to ensure the correctness of the implemented functionalities.
+- API Documentation: The project includes API documentation using Swagger UI, allowing users to explore and interact with the API endpoints.
+
 ## Getting Started
 
 These instructions will guide you on how to get a copy of the project up and running on your local machine.
