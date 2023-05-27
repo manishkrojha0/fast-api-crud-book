@@ -48,14 +48,17 @@ class UserRepository:
 
         return user_obj
     
-    def create_token(self, user: LoginUser):
-        user_obj = self.db.query(User).filter(User.email == user.email).first()
-        return signJWT(user.email, user_obj.role)
+    def create_token(self, email: str):
+        user_obj = self.get_user_by_email(email=email)
+        return signJWT(user_obj.email, user_obj.role)
     
     def login_user(self, user: LoginUser):
         is_authenticated = self.authenticate_user(email=user.email, password=user.password)
         if not is_authenticated:
             raise HTTPException(status_code=400, detail="Password is incorrect.")
+        token = self.create_token(email=user.email)
+
+        return token
 
 
     def authenticate_user(self, email: str, password: str):
