@@ -21,7 +21,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.post('/login')
 def login(auth_details: LoginUser, db: Session = Depends(get_db)):
     repository = UserRepository(db)
-    result = repository.create_token(auth_details)
+    result = repository.login_user(auth_details)
     if not result:
         raise HTTPException(status_code=400, detail="Auth details are invalid")
     return result

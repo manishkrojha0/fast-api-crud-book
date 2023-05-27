@@ -41,20 +41,30 @@ class UserRepository:
         return user_obj    
     
     def get_user_by_email(self, email: str):
-        return self.db.query(User).filter(User.email == email).first()
+        try:
+            user_obj = self.db.query(User).filter(User.email == email).first()
+        except User.DoesNotExist:
+           raise HTTPException(status_code=400, detail="Email is not registered")
+
+        return user_obj
     
     def create_token(self, user: LoginUser):
         user_obj = self.db.query(User).filter(User.email == user.email).first()
         return signJWT(user.email, user_obj.role)
     
+    def login_user(self, user: LoginUser):
+        is_authenticated = self.authenticate_user(email=user.email, password=user.password)
+        if not is_authenticated:
+            raise HTTPException(status_code=400, detail="Password is incorrect.")
 
-    def authenticate_user(self, email: str, password: str, hashed_password: str):
+
+    def authenticate_user(self, email: str, password: str):
         user = self.get_user_by_email(email=email)
 
         if not user:
             return False
         
-        if not self.auth_handler.verify_password(password, hashed_password):
+        if not self.auth_handler.verify_password(password, user.hashed_password):
             return False
 
         return True
