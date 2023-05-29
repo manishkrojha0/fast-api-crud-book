@@ -1,14 +1,18 @@
+import pytest
 import json
 from fastapi.testclient import TestClient
 from core.auth.jwt_auth_handler import signJWT
-from core.main import app
+from fastapi import FastAPI
+
+
+app = FastAPI()
 
 client = TestClient(app)
 
 def generate_token():
 
     user_email = "test_user@example.com"   
-    token = signJWT(user_email)
+    token = signJWT(user_id=user_email, role_id='admin')
     return token
 
 def test_create_book_with_authentication():
@@ -17,16 +21,34 @@ def test_create_book_with_authentication():
     token = generate_token()
 
     # Define the book data
-    book_data = {
-        "title": "string",
-        "publication_date": "string",
-        "description": "string",
+    payload = {
+        "title": "blahh",
+        "publication_date": "02-03-2022",
+        "description": "blah blah",
         "price": 0,
-        "author_name": "string"
+        "author_name": "blan mark"
     }
 
-    # Make a request to the /books endpoint with authentication and book data
-    response = client.post("/books", headers={"Authorization": f"Bearer {token}"}, json=book_data)
+    # Set the headers
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}"
+    }
+
+    # Send the POST request to create a book
+    response = client.post("/books", json=payload, headers=headers)
+
+    # Assert the response status code
+    assert response.status_code == 201
+
+    # Assert the response content
+    assert response.json() == {
+        "title": "blahh",
+        "publication_date": "02-03-2022",
+        "description": "blah blah",
+        "price": 0,
+        "author_name": "blan mark"
+    }
 
 def test_get_books_with_authentication():
     # Generate a valid token for authentication

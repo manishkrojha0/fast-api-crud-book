@@ -25,11 +25,7 @@ class Book(BookBase):
         orm_mode = True
 
 class BookPagination(BaseModel):
-    total: int
-    items: List[Book]
+    total: int | None
+    items: List[Book] | None
 
-class BookInResponse(BaseModel):
-    title: str
-    description: Optional[str]
-    author_name: str
 

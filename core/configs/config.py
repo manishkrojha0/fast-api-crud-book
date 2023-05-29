@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     POSTGRES_HOSTNAME: str
     DATABASE_URL: str
     JWT_SECRET_KEY: bytes
+    JWT_ALGORITHM: str
 
 
     class Config:

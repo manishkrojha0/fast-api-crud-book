@@ -1,16 +1,15 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from schemas.book import BookCreate, BookUpdate, BookInResponse, Book
+from schemas.book import BookCreate, BookUpdate, Book, BookPagination
 from repositories.book_repository import BookRepository
 from databases.database import get_db
-from models.user import User
-from schemas.user import User
-import fastapi.security as _security
-import sqlalchemy.orm as _orm
 from auth.auth_handler import AuthHandler
 from auth.auth_bearer import JWTBearer
+import redis
+import json
 
+rd = redis.Redis(host='localhost', port=6379, db=0)
 
 
 router = APIRouter()
@@ -25,19 +24,32 @@ def has_role(required_role: str = None):
     return _has_role
 
 
-@router.get("/books", dependencies=[Depends(JWTBearer())], response_model=List[Book])
+@router.get("/books", dependencies=[Depends(JWTBearer())], response_model=BookPagination)
 def get_books(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     repository = BookRepository(db)
     books = repository.get_books(skip=skip, limit=limit)
-    return books
+    total = len(books)
+    paginated_books = BookPagination(total=total, items=books)
+    return paginated_books
 
 
 @router.get("/books/{book_id}", dependencies=[Depends(JWTBearer())], response_model=Book)
 def get_book_by_id(book_id: int, db: Session = Depends(get_db)):
+    key = "book_id_" + str(book_id) # creating key for caching
+
+    if key in rd:
+        print("hit")
+        return json.loads(rd.get(key))
+    
     repository = BookRepository(db)
     book = repository.get_book_by_id(book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
+    p = book.__dict__
+    del p['_sa_instance_state']
+    print(p)
+
+    rd.set(key, json.dumps(p), nx=True)
     return book
 
 

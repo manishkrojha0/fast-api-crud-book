@@ -1,18 +1,11 @@
 from typing import List, Optional
-from models.book import Book
 from schemas.book import BookCreate, BookUpdate
 from models.book import Book
 from models.author import Author
 from sqlalchemy.orm import Session
 from repositories.interfaces.book_repository_interface import BookRepositoryInterface
 from sqlalchemy import asc, desc
-import email_validator as _email_check
-from fastapi import HTTPException
-from models.user import User
-from schemas.user import UserCreate, User as user
-import passlib.hash as _hash
-import jwt as _jwt
-from configs.config import settings
+
 
 
 
@@ -99,6 +92,7 @@ class BookRepository(BookRepositoryInterface):
         
         books = query.all()
         return books
+    
     
     # def create_user(self, user: UserCreate):
     #     try:

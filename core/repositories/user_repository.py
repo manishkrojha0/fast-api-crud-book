@@ -43,7 +43,7 @@ class UserRepository:
     def get_user_by_email(self, email: str):
         try:
             user_obj = self.db.query(User).filter(User.email == email).first()
-        except User.DoesNotExist:
+        except Exception:
            raise HTTPException(status_code=400, detail="Email is not registered")
 
         return user_obj
