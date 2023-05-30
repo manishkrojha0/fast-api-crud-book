@@ -9,9 +9,37 @@ app = FastAPI()
 
 client = TestClient(app)
 
+def test_create_user():
+    # Define the request payload
+    payload = {
+        "username": "testuser",
+        "email": "testuser@gmail.com",
+        "role": "admin",
+        "password": "string"
+    }
+
+    # Set the headers
+    headers = {
+        "Content-Type": "application/json",
+        "accept": "application/json"
+    }
+
+    # Send the POST request to create a user
+    response = client.post("/users/create_user", json=payload, headers=headers)
+
+    # Assert the response status code
+    assert response.status_code == 201
+
+    # Assert the response content
+    assert response.json() == {
+        "username": "testuser",
+        "email": "testuser@gmail.com",
+        "role": "admin"
+    }
+
 def generate_token():
 
-    user_email = "test_user@example.com"   
+    user_email = "testuser@gmail.com"   
     token = signJWT(user_id=user_email, role_id='admin')
     return token
 

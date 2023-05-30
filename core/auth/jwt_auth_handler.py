@@ -4,6 +4,16 @@ from typing import Dict
 
 import jwt
 
+import sys
+import os
+
+
+# Get the path to the project's root directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# Add the project's root directory to sys.path
+sys.path.insert(0, project_root)
+
 from configs.config import settings
 
 
